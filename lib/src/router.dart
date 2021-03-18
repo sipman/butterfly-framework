@@ -13,7 +13,37 @@ class Router {
 
     var methodGroup = endpoints[method];
     if (methodGroup != null) {
-      var endpoint = methodGroup[path];
+      // TODO: Clean up the wildcard search
+      var pathSections = path.split('/');
+      var endpointKey = methodGroup.keys.firstWhere((element) {
+        var sections = element.split('/');
+        if (sections.length != pathSections.length) {
+          return false;
+        }
+        for(var i = 0; i < sections.length; i++) {
+          if (!sections[i].startsWith('{{') && !sections[i].endsWith('}}') && sections[i] != pathSections[i]) {
+            return false;
+          }else if (sections[i].startsWith('{{') && sections[i].endsWith('}}')) {
+            var wildcardBody = sections[i].replaceAll('{', '').replaceAll('}', '').split(':');
+            var varName = wildcardBody[0].trim();
+
+            if (wildcardBody.length > 1) {
+              var type = wildcardBody[1].trim();
+              switch(type.toLowerCase()) {
+                case 'int':
+                  if(int.tryParse(pathSections[i]) == null) {
+                    return false;
+                  }
+              }
+            }
+
+
+            request.setParam(varName, pathSections[i]);
+          }
+        }
+        return true;
+      }, orElse: () => 'Not Found');
+      var endpoint = methodGroup[endpointKey];
       if (endpoint != null) {
         endpoint.callback(request, response);
       } else {

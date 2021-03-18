@@ -1,8 +1,8 @@
-import 'sayHelloWorldListener.dart';
+import 'sayHelloWorldByIdListener.dart';
 
-class SayHelloWorldUseCase {
+class SayHelloWorldByIdUseCase {
   SayHelloWorldListener _listener;
-  SayHelloWorldUseCase(this._listener);
+  SayHelloWorldByIdUseCase(this._listener);
 
   void execute(int? id) {
     if (id != null) {
