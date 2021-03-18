@@ -1,13 +1,13 @@
 import 'dart:collection';
-import 'dart:io';
 
 import 'package:butterfly/butterfly.dart';
 import 'package:butterfly/src/endpoint.dart';
+import 'package:butterfly/src/response.dart';
 
 class Router {
   HashMap<String, HashMap<String, Endpoint>> endpoints = HashMap();
 
-  void handle(Request request) {
+  void handle(Request request, Response response) {
     var method = request.method.toLowerCase();
     var path = request.path.toLowerCase();
 
@@ -15,16 +15,12 @@ class Router {
     if (methodGroup != null) {
       var endpoint = methodGroup[path];
       if (endpoint != null) {
-        endpoint.callback(request);
+        endpoint.callback(request, response);
       } else {
-        request.response
-          ..statusCode = HttpStatus.notFound
-          ..write('404 not found.');
+        response.onNotFound('404 not found.');
       }
     } else {
-      request.response
-        ..statusCode = HttpStatus.methodNotAllowed
-        ..write('Unsupported request: ${request.method}.');
+      response.onMethodNotAllowed('Unsupported request: ${request.method}.');
     }
   }
 
@@ -37,5 +33,4 @@ class Router {
 
     endpoints[method]![path] = endpoint;
   }
-
 }

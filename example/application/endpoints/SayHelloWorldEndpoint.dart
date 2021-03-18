@@ -1,5 +1,6 @@
 import 'package:butterfly/butterfly.dart';
 import 'package:butterfly/src/endpoint.dart';
+import 'package:butterfly/src/response.dart';
 
 import '../../useCases/SayHelloWorld/sayHelloWorldUseCase.dart';
 import '../presenters/SayHelloWorldPresenter.dart';
@@ -12,8 +13,8 @@ class SayHelloWorldEndpoint implements Endpoint {
   String method = 'get';
 
   @override
-  Function(Request) callback = (request) {
-    var presenter = SayHelloWorldPresenter(request);
+  Function(Request, Response) callback = (request, response) {
+    var presenter = SayHelloWorldPresenter(response);
     var useCase = SayHelloWorldUseCase(presenter);
 
     var id;
