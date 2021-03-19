@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:butterfly/butterfly.dart';
 import 'package:butterfly/src/response.dart';
 
-import '../../useCases/SayHelloWorld/sayHelloWorldListener.dart';
+import '../../useCases/SayHelloWorld/sayHelloWorldByIdListener.dart';
 
 class SayHelloWorldPresenter implements SayHelloWorldListener {
   final Response _response;
