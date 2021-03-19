@@ -19,6 +19,10 @@ class Request {
     _params[key] = value;
   }
 
+  void setParams(HashMap<String, String> params) {
+    _params.addAll(params);
+  }
+
   Map<String, String> get queryParams {
     return _request.uri.queryParameters;
   }
@@ -26,4 +30,6 @@ class Request {
   Map<String, String> get params {
     return _params;
   }
+
+
 }
