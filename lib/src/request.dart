@@ -2,6 +2,7 @@ import 'dart:io';
 
 class Request {
   final HttpRequest _request;
+
   Request(this._request);
 
   String get path {
@@ -14,9 +15,5 @@ class Request {
 
   Map<String, String> get params {
     return _request.uri.queryParameters;
-  }
-
-  HttpResponse get response {
-    return _request.response;
   }
 }

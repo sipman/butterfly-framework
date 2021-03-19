@@ -1,20 +1,18 @@
 import 'dart:io';
 
 import 'package:butterfly/butterfly.dart';
+import 'package:butterfly/src/response.dart';
 
 import '../../useCases/SayHelloWorld/sayHelloWorldListener.dart';
 
 class SayHelloWorldPresenter implements SayHelloWorldListener {
-  final Request _request;
+  final Response _response;
 
-  SayHelloWorldPresenter(this._request);
+  SayHelloWorldPresenter(this._response);
 
   @override
   void onSayHelloWorld(String greeting) {
-    _request.response
-      ..headers.contentType = ContentType.html
-      ..statusCode = HttpStatus.ok
-      ..write('''<html>
+    _response.setContentType(ContentType.html).onSuccess('''<html>
           <head>
             <title>Yaaah, it works!</title>
           </head>
