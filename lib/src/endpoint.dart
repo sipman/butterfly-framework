@@ -2,9 +2,9 @@ import 'package:butterfly/src/response.dart';
 
 import '../butterfly.dart';
 
-abstract class Endpoint {
+abstract class Endpoint<T extends Request> {
   String path = '';
   String method = '';
 
-  Function(Request, Response) callback = (request, response) {};
+  void callback(T request, Response response);
 }

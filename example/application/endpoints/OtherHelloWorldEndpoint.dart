@@ -4,8 +4,9 @@ import 'package:butterfly/src/response.dart';
 
 import '../../useCases/SayHelloWorld/SayHelloWorldByUserName.dart';
 import '../presenters/SayHelloWorldPresenter.dart';
+import '../requests/SayHelloWithStringRequest.dart';
 
-class OtherHelloWorldEndpoint implements Endpoint {
+class OtherHelloWorldEndpoint implements Endpoint<SayHelloWithStringRequest> {
   @override
   String method = 'get';
 
@@ -13,14 +14,12 @@ class OtherHelloWorldEndpoint implements Endpoint {
   String path = '/sayHello/{{name: String}}';
 
   @override
-  Function(Request, Response) callback = (request, response) {
+  void callback(SayHelloWithStringRequest request, Response response) {
     var presenter = SayHelloWorldPresenter(response);
     var useCase = SayHelloWorldByUserNameUseCase(presenter);
 
-    var name = request.params['name'];
-
-    useCase.execute(name);
-  };
+    useCase.execute(request.mikkel);
+  }
 
 
 }

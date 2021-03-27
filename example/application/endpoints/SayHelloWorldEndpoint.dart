@@ -4,8 +4,9 @@ import 'package:butterfly/src/response.dart';
 
 import '../../useCases/SayHelloWorld/sayHelloWorldByIdUseCase.dart';
 import '../presenters/SayHelloWorldPresenter.dart';
+import '../requests/SayHelloWithIdRequest.dart';
 
-class SayHelloWorldEndpoint implements Endpoint {
+class SayHelloWorldEndpoint implements Endpoint<SayHelloWithIdRequest> {
   @override
   String path = '/sayHello/{{id: int}}';
 
@@ -13,12 +14,11 @@ class SayHelloWorldEndpoint implements Endpoint {
   String method = 'get';
 
   @override
-  Function(Request, Response) callback = (request, response) {
+  void callback(SayHelloWithIdRequest request, Response response) {
     var presenter = SayHelloWorldPresenter(response);
     var useCase = SayHelloWorldByIdUseCase(presenter);
 
-    var id = int.tryParse(request.params['id']!);
+    useCase.execute(request.id);
+  }
 
-    useCase.execute(id);
-  };
 }

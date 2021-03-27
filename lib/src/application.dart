@@ -13,12 +13,12 @@ class Application {
 
     print('Butterfly is listening on localhost:${_server.port}');
 
-    await for (HttpRequest incommingRequest in _server) {
-      var request = Request(incommingRequest);
+    await for (HttpRequest incomingRequest in _server) {
+      var request = Request(incomingRequest);
       var response = Response();
       router.handle(request, response);
-      _buildResponse(incommingRequest, response);
-      await incommingRequest.response.close();
+      _buildResponse(incomingRequest, response);
+      await incomingRequest.response.close();
     }
   }
 

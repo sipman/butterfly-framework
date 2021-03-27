@@ -2,17 +2,17 @@ import 'dart:io';
 import 'dart:collection';
 
 class Request {
-  final HttpRequest _request;
+  final HttpRequest request;
   final HashMap<String, String> _params = HashMap();
 
-  Request(this._request);
+  Request(this.request);
 
   String get path {
-    return _request.uri.path;
+    return request.uri.path;
   }
 
   String get method {
-    return _request.method;
+    return request.method;
   }
 
   void  setParam(String key, String value){
@@ -24,7 +24,7 @@ class Request {
   }
 
   Map<String, String> get queryParams {
-    return _request.uri.queryParameters;
+    return request.uri.queryParameters;
   }
 
   Map<String, String> get params {

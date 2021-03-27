@@ -1,0 +1,3 @@
+class TransferObject {
+  const TransferObject();
+}
