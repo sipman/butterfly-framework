@@ -2,7 +2,7 @@ import 'dart:collection';
 import 'dart:mirrors';
 import 'package:collection/collection.dart';
 import 'package:butterfly/butterfly.dart';
-import 'package:butterfly/src/annotations/transferObject.dart';
+import 'package:butterfly/src/annotations/transfer_object.dart';
 import 'package:butterfly/src/endpoint.dart';
 import 'package:butterfly/src/response.dart';
 
