@@ -107,13 +107,17 @@ class Router {
   bool pathMatchesEndpoint(String element, List<String> pathSections) {
       var sections = element.split('/');
       
-      if (sections.length != pathSections.length) {
+      if (pathSections.last.isNotEmpty && sections.length != pathSections.length) {
         return false;
       }
 
       for(var i = 0; i < sections.length; i++) {
         if (_sectionIsWildcard(sections[i])) {
-          return _wildcardValueIsCorrectType(sections[i], pathSections[i]);
+          if (pathSections[i].isEmpty) {
+            return false;
+          } else {
+            return _wildcardValueIsCorrectType(sections[i], pathSections[i]);
+          }
         } else if (_sectionsNotEqual(sections[i], pathSections[i])) {
           return false;
         }

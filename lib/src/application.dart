@@ -16,11 +16,19 @@ class Application {
         .then((server) async {
           print('Butterfly is listening on localhost:${server.port}');
           server.listen((HttpRequest incomingRequest) async {
-            var request = Request(incomingRequest);
-            var response = Response();
-            await router.handle(request, response);
-            _buildResponse(incomingRequest, response);
-            await incomingRequest.response.close();
+            try {
+              var request = Request(incomingRequest);
+              var response = Response();
+              await router.handle(request, response);
+              _buildResponse(incomingRequest, response);
+              await incomingRequest.response.close();
+            } catch(e) {
+              incomingRequest.response
+                ..statusCode=500
+                ..writeln('Internal Server Error 500');
+
+              await incomingRequest.response.close();
+            }
           });
         });
   }

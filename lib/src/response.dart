@@ -26,6 +26,14 @@ class Response {
     return onResponse(404, body);
   }
 
+  Response onCreated(dynamic body) {
+    return onResponse(201, body);
+  }
+
+  Response onUnprocessableEntity(dynamic body) {
+    return onResponse(422, body);
+  }
+
   Response onSuccess(dynamic body) {
     return onResponse(200, body);
   }
