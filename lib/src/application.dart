@@ -8,7 +8,7 @@ import '../butterfly.dart';
 
 class Application {
   Router router = Router();
-  Map<String, String> _headers = {};
+  final Map<String, String> _headers = {};
 
   void run() async {
     return HttpServer
