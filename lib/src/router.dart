@@ -1,18 +1,18 @@
 import 'dart:collection';
 import 'dart:mirrors';
-
+import 'package:collection/collection.dart';
 import 'package:butterfly/butterfly.dart';
-import 'package:butterfly/src/annotations/inputConverter.dart';
 import 'package:butterfly/src/annotations/transferObject.dart';
 import 'package:butterfly/src/endpoint.dart';
 import 'package:butterfly/src/response.dart';
 
+import 'annotations/Body.dart';
 import 'annotations/param.dart';
 
 class Router {
-  LinkedHashMap<String, HashMap<String, Endpoint>> endpoints = LinkedHashMap();
+  LinkedHashMap<String, List<Endpoint>> endpoints = LinkedHashMap();
 
-  void handle(Request request, Response response) {
+  Future<void> handle(Request request, Response response) async {
     var method = request.method.toLowerCase();
     var path = request.path.toLowerCase();
 
@@ -24,7 +24,7 @@ class Router {
         request = _buildCorrectRequest(request, endpoint);
         var params = _convertWildcardsToParamMap(endpoint, path);
         request.setParams(params);
-        _injectParamsOnRequest(params, request);
+        await _injectDataOnRequest(params, request);
         endpoint.callback(request, response);
       } else {
         response.onNotFound('404 not found.');
@@ -36,15 +36,14 @@ class Router {
 
   void registerEndpoint(Endpoint endpoint) {
     var method = endpoint.method.toLowerCase();
-    var path = endpoint.path.toLowerCase();
     if (!endpoints.containsKey(method)) {
-      endpoints[method] = HashMap();
+      endpoints[method] = [];
     }
 
-    endpoints[method]![path] = endpoint;
+    endpoints[method]!.add(endpoint);
   }
 
-  void _injectParamsOnRequest(Map<String, String> params, Request request) {
+  Future<void> _injectDataOnRequest(Map<String, String> params, Request request) async {
     var reflection = reflect(request);
     var classMirror = reflectClass(request.runtimeType);
 
@@ -52,19 +51,22 @@ class Router {
       if (v.metadata.isNotEmpty) {
         if (v.metadata.first.reflectee is Param) {
           String identifier = v.metadata.first.reflectee.name;
-
           var varMirror = classMirror.declarations.entries.firstWhere((element) {
             return element.key == v.simpleName;
           }).value as VariableMirror;
           var value = _checkParamType(params[identifier]!, varMirror.type.reflectedType);
           reflection.setField(v.simpleName, value);
+        } else if (v.metadata.first.reflectee is Body) {
+          var varMirror = classMirror.declarations.entries.firstWhere((element) {
+            return element.key == v.simpleName;
+          }).value as VariableMirror;
+
+          var value = _parseJsonToTransferObject(await request.body, varMirror.type.reflectedType);
+
+          reflection.setField(v.simpleName, value);
         }
       }
     }
-  }
-
-  T? tryParse<T>(String value) {
-    return value as T;
   }
 
   Request _buildCorrectRequest(Request request, Endpoint endpoint) {
@@ -76,15 +78,13 @@ class Router {
     return foo.reflectee;
   }
 
-  Endpoint? getEndpoint(String path, HashMap<String, Endpoint>? methodGroup) {
+  Endpoint? getEndpoint(String path, List<Endpoint>? methodGroup) {
     var pathSections = path.split('/');
-    var endpointKey = methodGroup?.keys
-        .firstWhere(
-            (e) => pathMatchesEndpoint(e, pathSections),
-            orElse: () => 'Not Found'
+   var endpoint = methodGroup?.firstWhereOrNull(
+            (e) => pathMatchesEndpoint(e.path, pathSections)
     );
 
-    return methodGroup?[endpointKey];
+    return endpoint;
   }
 
   HashMap<String, String> _convertWildcardsToParamMap(Endpoint endpoint, String path) {
@@ -132,16 +132,26 @@ class Router {
     return true;
   }
 
+  dynamic _parseJsonToTransferObject(Map<String, dynamic> body, Type reflectedType) {
+    var reflection = reflectClass(reflectedType);
+    if (reflection.metadata.isNotEmpty && reflection.metadata.first.reflectee is TransferObject) {
+      for (var m in reflection.declarations.values) {
+        if (m is MethodMirror && m.constructorName == Symbol('fromJson')) {
+          return reflection.newInstance(Symbol('fromJson'), [body]).reflectee;
+        }
+      }
+    } else {
+      throw Exception('The type ${reflectedType.toString()} does not have a fromJson factory');
+    }
+  }
+
   dynamic _checkParamType(String param, Type type) {
     var reflection = reflectClass(type);
     if (reflection.metadata.isNotEmpty) {
       if (reflection.metadata.first.reflectee is TransferObject) {
-        for (var m in reflection.staticMembers.values) {
-          if (m.metadata.isNotEmpty) {
-            var reflectee = m.metadata.first.reflectee;
-            if (reflectee is InputConverter && reflectee.method == 'fromString') {
-              return reflection.invoke(m.simpleName, [param]).reflectee;
-            }
+        for (var m in reflection.declarations.values) {
+          if (m is MethodMirror && m.constructorName == Symbol('fromString')) {
+            return reflection.newInstance(Symbol('fromString'), [param]).reflectee;
           }
         }
       }
@@ -175,7 +185,7 @@ class Router {
   }
   
   bool _sectionsNotEqual(String section, String pathSection) {
-    return !_sectionIsWildcard(section) && section != pathSection;
+    return !_sectionIsWildcard(section) && section.toLowerCase() != pathSection.toLowerCase();
   }
 
   List<String> _convertWildcardToList(String wildcard) {

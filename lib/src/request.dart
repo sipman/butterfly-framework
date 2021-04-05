@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:collection';
+import 'dart:convert';
 
 class Request {
   final HttpRequest request;
@@ -29,6 +30,10 @@ class Request {
 
   Map<String, String> get params {
     return _params;
+  }
+
+  Future<Map<String, dynamic>> get body {
+    return utf8.decoder.bind(request).join().then((value) => jsonDecode(value) as Map<String, dynamic>);
   }
 
 

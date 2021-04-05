@@ -1,4 +1,3 @@
-import 'package:butterfly/src/annotations/inputConverter.dart';
 import 'package:butterfly/src/annotations/transferObject.dart';
 
 @TransferObject()
@@ -8,8 +7,7 @@ class Date {
   final int month;
   final int day;
 
-  @InputConverter.fromString()
-  static Date convertStringToDate(String date){
+  factory Date.fromString(String date) {
     var seperated = date.split('-');
     return Date(int.parse(seperated[0]),int.parse(seperated[1]),int.parse(seperated[2]));
   }

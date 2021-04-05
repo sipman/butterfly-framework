@@ -2,14 +2,14 @@ import "dart:io";
 
 class Response {
   int _responseCode = 200;
-  String _body = '';
+  dynamic _body = '';
   ContentType _contentType = ContentType.json;
 
   int get responseCode {
     return _responseCode;
   }
 
-  String get body {
+  dynamic get body {
     return _body;
   }
 
@@ -22,19 +22,19 @@ class Response {
     return this;
   }
 
-  Response onNotFound(String body) {
+  Response onNotFound(dynamic body) {
     return onResponse(404, body);
   }
 
-  Response onSuccess(String body) {
+  Response onSuccess(dynamic body) {
     return onResponse(200, body);
   }
 
-  Response onMethodNotAllowed(String body) {
+  Response onMethodNotAllowed(dynamic body) {
     return onResponse(405, body);
   }
 
-  Response onResponse(int statusCode, String body) {
+  Response onResponse(int statusCode, dynamic body) {
     _responseCode = statusCode;
     _body = body;
     return this;
