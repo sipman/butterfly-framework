@@ -1,4 +1,5 @@
 import 'package:butterfly/butterfly.dart';
+import 'package:butterfly/src/staticFileEndpoint.dart';
 
 import '../repositories/task_repository.dart';
 import 'endpoints/create_new_task_endpoint.dart';
@@ -14,6 +15,7 @@ void main() {
   application.registerEndpoint(GetTaskByTitleEndpoint(taskRepository));
   application.registerEndpoint(ListActiveTasksEndpoint(taskRepository));
   application.registerEndpoint(CreateNewTaskEndpoint(taskRepository));
+  application.registerEndpoint(StaticFileEndpoint('example/application/public'));
 
   application.run();
 }

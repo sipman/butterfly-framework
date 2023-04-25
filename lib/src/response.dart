@@ -3,7 +3,7 @@ import 'dart:io';
 class Response {
   int _responseCode = 200;
   dynamic _body = '';
-  ContentType _contentType = ContentType.json;
+  ContentType contentType = ContentType.json;
 
   int get responseCode {
     return _responseCode;
@@ -12,13 +12,8 @@ class Response {
   dynamic get body {
     return _body;
   }
-
-  ContentType get contentType {
-    return _contentType;
-  }
-
   Response setContentType(ContentType contentType) {
-    _contentType = contentType;
+    this.contentType = contentType;
     return this;
   }
 
